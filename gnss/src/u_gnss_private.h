@@ -215,6 +215,7 @@ typedef struct {
                        int32_t altitudeMillimetres,
                        int32_t radiusMillimetres,
                        int32_t speedMillimetresPerSecond,
+                       int32_t headMotionX1e5,
                        int32_t svs,
                        int64_t timeUtc);
     int32_t measurementPeriodMs; /**< set to -1 of nothing to restore. */

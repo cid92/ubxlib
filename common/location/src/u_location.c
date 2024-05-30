@@ -135,6 +135,7 @@ static void gnssPosCallback(uDeviceHandle_t devHandle,
                             int32_t altitudeMillimetres,
                             int32_t radiusMillimetres,
                             int32_t speedMillimetresPerSecond,
+                            int32_t headMotionX1e5,
                             int32_t svs,
                             int64_t timeUtc)
 {
@@ -471,6 +472,7 @@ int32_t uLocationGet(uDeviceHandle_t devHandle, uLocationType_t type,
                                             &(location.altitudeMillimetres),
                                             &(location.radiusMillimetres),
                                             &(location.speedMillimetresPerSecond),
+                                            &(location.headMotionX1e5),
                                             &(location.svs),
                                             &(location.timeUtc),
                                             pKeepGoingCallback);
@@ -531,6 +533,7 @@ int32_t uLocationGet(uDeviceHandle_t devHandle, uLocationType_t type,
                                     &(location.altitudeMillimetres),
                                     &(location.radiusMillimetres),
                                     &(location.speedMillimetresPerSecond),
+                                    &(location.headMotionX1e5),
                                     &(location.svs),
                                     &(location.timeUtc),
                                     pKeepGoingCallback);

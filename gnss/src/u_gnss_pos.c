@@ -117,6 +117,7 @@ typedef struct {
                        int32_t altitudeMillimetres,
                        int32_t radiusMillimetres,
                        int32_t speedMillimetresPerSecond,
+                       int32_t headMotionX1e5,
                        int32_t svs,
                        int64_t timeUtc);
 } uGnssPosGetTaskParameters_t;
@@ -148,6 +149,7 @@ static int32_t posDecode(char *pMessage,
                          int32_t *pRadiusMillimetres,
                          int32_t *pAltitudeUncertaintyMillimetres,
                          int32_t *pSpeedMillimetresPerSecond,
+                         int32_t *pHeadMotionX1e5,
                          int32_t *pSvs, int64_t *pTimeUtc, bool printIt)
 {
     int32_t errorCode = (int32_t) U_ERROR_COMMON_TIMEOUT;
@@ -244,6 +246,13 @@ static int32_t posDecode(char *pMessage,
         if (pSpeedMillimetresPerSecond != NULL) {
             *pSpeedMillimetresPerSecond = y;
         }
+        y = (int32_t) uUbxProtocolUint32Decode(pMessage + 64);
+        if (printIt) {
+            uPortLog("U_GNSS_POS: head motion = %d (degrees * 10^5).\n", y);
+        }
+        if (pHeadMotionX1e5 != NULL) {
+            *pHeadMotionX1e5  = y;
+        }
         errorCode = (int32_t) U_ERROR_COMMON_SUCCESS;
         //lint -restore
     }
@@ -258,6 +267,7 @@ static int32_t posGet(uGnssPrivateInstance_t *pInstance,
                       int32_t *pRadiusMillimetres,
                       int32_t *pAltitudeUncertaintyMillimetres,
                       int32_t *pSpeedMillimetresPerSecond,
+                      int32_t *pHeadMotionX1e5,
                       int32_t *pSvs, int64_t *pTimeUtc, bool printIt)
 {
     int32_t errorCode = (int32_t) U_ERROR_COMMON_TIMEOUT;
@@ -275,6 +285,7 @@ static int32_t posGet(uGnssPrivateInstance_t *pInstance,
                               pRadiusMillimetres,
                               pAltitudeUncertaintyMillimetres,
                               pSpeedMillimetresPerSecond,
+                              pHeadMotionX1e5,
                               pSvs, pTimeUtc, printIt);
     } else {
         if (errorCode >= 0) {
@@ -299,6 +310,7 @@ static void posGetTask(void *pParameter)
     int32_t radiusMillimetres = -1;
     int32_t altitudeUncertaintyMillimetres = 0;
     int32_t speedMillimetresPerSecond = INT_MIN;
+    int32_t headMotionX1e5 = INT_MIN;
     int32_t svs = -1;
     int64_t timeUtc = -1;
 
@@ -324,6 +336,7 @@ static void posGetTask(void *pParameter)
                            &radiusMillimetres,
                            &altitudeUncertaintyMillimetres,
                            &speedMillimetresPerSecond,
+                           &headMotionX1e5,
                            &svs,
                            &timeUtc, false);
         if (errorCode != 0) {
@@ -334,7 +347,7 @@ static void posGetTask(void *pParameter)
     // Call the callback
     taskParameters.pCallback(taskParameters.gnssHandle, errorCode, latitudeX1e7,
                              longitudeX1e7, altitudeMillimetres, radiusMillimetres,
-                             speedMillimetresPerSecond, svs, timeUtc);
+                             speedMillimetresPerSecond, headMotionX1e5, svs, timeUtc);
     if (errorCode == 0) {
         // As well as the above, test the position against any
         // fences associated with the instance, which may result
@@ -370,6 +383,7 @@ static void messageCallback(uDeviceHandle_t gnssHandle,
     int32_t radiusMillimetres = -1;
     int32_t altitudeUncertaintyMillimetres = 0;
     int32_t speedMillimetresPerSecond = INT_MIN;
+    int32_t headMotionX1e5 = INT_MIN;
     int32_t svs = -1;
     int64_t timeUtc = -1;
 
@@ -390,6 +404,7 @@ static void messageCallback(uDeviceHandle_t gnssHandle,
                                       &radiusMillimetres,
                                       &altitudeUncertaintyMillimetres,
                                       &speedMillimetresPerSecond,
+                                      &headMotionX1e5,
                                       &svs, &timeUtc, false);
         // Call the callback
         // Note: there can be two handles involved here, e.g. if
@@ -402,6 +417,7 @@ static void messageCallback(uDeviceHandle_t gnssHandle,
                                                 altitudeMillimetres,
                                                 radiusMillimetres,
                                                 speedMillimetresPerSecond,
+                                                headMotionX1e5,
                                                 svs,
                                                 timeUtc);
         if (errorCodeOrLength == 0) {
@@ -440,6 +456,7 @@ int32_t uGnssPosGet(uDeviceHandle_t gnssHandle,
                     int32_t *pAltitudeMillimetres,
                     int32_t *pRadiusMillimetres,
                     int32_t *pSpeedMillimetresPerSecond,
+                    int32_t *pHeadMotionX1e5,
                     int32_t *pSvs, int64_t *pTimeUtc,
                     bool (*pKeepGoingCallback) (uDeviceHandle_t))
 {
@@ -449,6 +466,7 @@ int32_t uGnssPosGet(uDeviceHandle_t gnssHandle,
     int32_t longitudeX1e7 = INT_MIN;
     int32_t altitudeMillimetres = INT_MIN;
     int32_t radiusMillimetres = -1;
+    int32_t headMotionX1e5 = INT_MIN;
     int32_t altitudeUncertaintyMillimetres = 0;
 #ifdef U_CFG_SARA_R5_M8_WORKAROUND
     uint8_t message[4]; // Room for the body of a UBX-CFG-ANT message
@@ -494,6 +512,7 @@ int32_t uGnssPosGet(uDeviceHandle_t gnssHandle,
                                    &radiusMillimetres,
                                    &altitudeUncertaintyMillimetres,
                                    pSpeedMillimetresPerSecond,
+                                   &headMotionX1e5,
                                    pSvs, pTimeUtc, true);
                 if (errorCode == 0) {
                     // As well as the above, test the position against any
@@ -521,6 +540,9 @@ int32_t uGnssPosGet(uDeviceHandle_t gnssHandle,
                 if (pRadiusMillimetres != NULL) {
                     *pRadiusMillimetres = radiusMillimetres;
                 }
+                if (pHeadMotionX1e5 != NULL) {
+                    *pHeadMotionX1e5 = headMotionX1e5;
+                }
             }
         }
 
@@ -539,6 +561,7 @@ int32_t uGnssPosGetStart(uDeviceHandle_t gnssHandle,
                                             int32_t altitudeMillimetres,
                                             int32_t radiusMillimetres,
                                             int32_t speedMillimetresPerSecond,
+                                            int32_t headMotionX1e5,
                                             int32_t svs,
                                             int64_t timeUtc))
 {
@@ -665,6 +688,7 @@ int32_t uGnssPosGetStreamedStart(uDeviceHandle_t gnssHandle,
                                                     int32_t altitudeMillimetres,
                                                     int32_t radiusMillimetres,
                                                     int32_t speedMillimetresPerSecond,
+                                                    int32_t headMotionX1e5,
                                                     int32_t svs,
                                                     int64_t timeUtc))
 {

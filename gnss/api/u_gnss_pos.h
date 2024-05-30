@@ -113,6 +113,8 @@ void uGnssPosPrivateLink(void);
  *                                         millimetres per second); may be
  *                                         NULL.  If the speed is unknown
  *                                         -1 will be returned.
+ * @param[out] pHeadMotionX1e5             a place to put the head motion 
+ *                                         (in 10e-5 degrees); may be NULL.
  * @param[out] pSvs                        a place to store the number of
  *                                         space vehicles used in the
  *                                         solution; may be NULL. If the
@@ -157,6 +159,7 @@ int32_t uGnssPosGet(uDeviceHandle_t gnssHandle,
                     int32_t *pAltitudeMillimetres,
                     int32_t *pRadiusMillimetres,
                     int32_t *pSpeedMillimetresPerSecond,
+                    int32_t *pHeadMotionX1e5,
                     int32_t *pSvs, int64_t *pTimeUtc,
                     bool (*pKeepGoingCallback) (uDeviceHandle_t));
 
@@ -195,6 +198,7 @@ int32_t uGnssPosGetStart(uDeviceHandle_t gnssHandle,
                                             int32_t altitudeMillimetres,
                                             int32_t radiusMillimetres,
                                             int32_t speedMillimetresPerSecond,
+                                            int32_t headMotionX1e5,
                                             int32_t svs,
                                             int64_t timeUtc));
 
@@ -269,6 +273,7 @@ int32_t uGnssPosGetStreamedStart(uDeviceHandle_t gnssHandle,
                                                     int32_t altitudeMillimetres,
                                                     int32_t radiusMillimetres,
                                                     int32_t speedMillimetresPerSecond,
+                                                    int32_t headMotionX1e5,
                                                     int32_t svs,
                                                     int64_t timeUtc));
 

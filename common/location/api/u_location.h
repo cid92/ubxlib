@@ -266,6 +266,7 @@ typedef struct {
                                             per second); if the speed
                                             is unknown INT_MIN will be
                                             returned. */
+    int32_t headMotionX1e5;             /** the heading motion in 10e-5 degrees*/
     int32_t svs;                       /**< the number of space vehicles
                                             used in establishing the
                                             location.  If the number of

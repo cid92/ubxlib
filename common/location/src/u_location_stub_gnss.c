@@ -63,6 +63,7 @@ U_WEAK int32_t uGnssPosGet(uDeviceHandle_t gnssHandle,
                            int32_t *pAltitudeMillimetres,
                            int32_t *pRadiusMillimetres,
                            int32_t *pSpeedMillimetresPerSecond,
+                           int32_t *pHeadMotionX1e5,
                            int32_t *pSvs, int64_t *pTimeUtc,
                            bool (*pKeepGoingCallback) (uDeviceHandle_t))
 {
@@ -86,6 +87,7 @@ U_WEAK int32_t uGnssPosGetStart(uDeviceHandle_t gnssHandle,
                                                    int32_t altitudeMillimetres,
                                                    int32_t radiusMillimetres,
                                                    int32_t speedMillimetresPerSecond,
+                                                   int32_t headMotionX1e5,
                                                    int32_t svs,
                                                    int64_t timeUtc))
 {
@@ -118,6 +120,7 @@ U_WEAK int32_t uGnssPosGetStreamedStart(uDeviceHandle_t gnssHandle,
                                                            int32_t altitudeMillimetres,
                                                            int32_t radiusMillimetres,
                                                            int32_t speedMillimetresPerSecond,
+                                                           int32_t headMotionX1e5,
                                                            int32_t svs,
                                                            int64_t timeUtc))
 {
