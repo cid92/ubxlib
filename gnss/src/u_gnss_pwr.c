@@ -776,7 +776,7 @@ int32_t uGnssPwrOffBackup(uDeviceHandle_t gnssHandle)
                 // GNSS chip after this will wake it up again, so we just
                 // use uGnssPrivateSendReceiveUbxMessage() with an
                 // empty response buffer
-                message[8] = 0x02; // Backup
+                message[8] = 0x06; // Backup force USB off
                 //lint -save -e569 Suppress loss of information: OK on all our compilers
                 message[12] = 0xe4; // Wake-up on all sources
                 //lint -restore
